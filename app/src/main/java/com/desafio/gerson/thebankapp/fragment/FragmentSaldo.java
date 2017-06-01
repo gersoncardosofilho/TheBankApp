@@ -9,6 +9,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +19,9 @@ import com.desafio.gerson.thebankapp.R;
 import com.desafio.gerson.thebankapp.activity.MainActivity;
 import com.desafio.gerson.thebankapp.model.Cliente;
 import com.desafio.gerson.thebankapp.util.TheBankUtil;
+
+import java.text.NumberFormat;
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -67,6 +71,7 @@ public class FragmentSaldo extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ((MainActivity) getActivity()).setActionBarTitle(FRAG_ID);
+        activity = getActivity();
 
 
 
@@ -77,15 +82,20 @@ public class FragmentSaldo extends Fragment {
                              Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_saldo, container, false);
-
+        cliente = Cliente.getClienteByContaCorrente(mContaCorrente);
         ButterKnife.bind(this, view);
 
-        activity = getActivity();
-
-        cliente = Cliente.getClienteByContaCorrente(mContaCorrente);
+        String saldoAtual = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("pt-BR")).format(cliente.getSaldo());
 
         saldoNome.setText(cliente.getNome());
-        valorSaldo.setText(valueOf(cliente.getSaldo()).toString());
+        valorSaldo.setText(saldoAtual);
+
+        if (cliente.getSaldo() < 0){
+            valorSaldo.setTextColor(ContextCompat.getColor(activity, R.color.red));
+        } else {
+            valorSaldo.setTextColor(ContextCompat.getColor(activity, R.color.colorAccent));
+        }
+
 
         Realm realm = Realm.getDefaultInstance();
 
