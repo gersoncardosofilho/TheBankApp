@@ -115,6 +115,8 @@ public class LoginActivity extends AppCompatActivity {
         @Override
         public void onResponse(Call<Cliente> call, final Response<Cliente> response) {
             //login succeeded logic
+            Toast.makeText(getApplicationContext(), R.string.login_sucesso, Toast.LENGTH_SHORT).show();
+
             int statusCode = response.code();
             final Cliente clienteResponse = response.body();
             //status code 200 = success operation
@@ -124,7 +126,6 @@ public class LoginActivity extends AppCompatActivity {
             {
                 Log.d(TAG,"Login realizado com sucesso");
                 progressBar.setVisibility(View.GONE);
-                Snackbar.make(root, R.string.login_sucesso, Snackbar.LENGTH_LONG).show();
 
                 //Checks for client
 

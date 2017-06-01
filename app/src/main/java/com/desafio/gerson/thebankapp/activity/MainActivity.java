@@ -1,5 +1,6 @@
 package com.desafio.gerson.thebankapp.activity;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -42,6 +43,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     Cliente cliente;
     String contaCorrente;
     String perfil;
+    
 
     Bundle args = new Bundle();
 
@@ -70,17 +72,28 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        cliente = Cliente.getClienteByContaCorrente(contaCorrente);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+
+        if(cliente.getPerfil().equals("vip")){
+            fab.setVisibility(View.VISIBLE);
+            fab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(final View view) {
+
+                    requisitaVisita();
+
+                }
+            });
+
+
+
+        } else {
+            fab.setVisibility(View.INVISIBLE);
+        }
 
 
         //Starts first fragment
@@ -246,6 +259,31 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             startActivity(intent);
         }
 
+    }
+
+    public void requisitaVisita(){
+        if(cliente.getPerfil().equals("vip")){
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setPositiveButton(R.string.confirma, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+
+                    Snackbar.make(getWindow().getDecorView().getRootView(), R.string.visita_confirmada, Snackbar.LENGTH_SHORT).show();
+                }
+            });
+
+            builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    return;
+                }
+            });
+
+            builder.setTitle(R.string.titulo_solicita_visita);
+            builder.setMessage(R.string.mensagem_solicita_visita);
+            AlertDialog dialog = builder.create();
+            dialog.show();
+        }
     }
 
 

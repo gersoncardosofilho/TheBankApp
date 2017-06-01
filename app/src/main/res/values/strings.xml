@@ -39,6 +39,9 @@
     <string name="mensagem_sair_aplicacao">Tem certeza que deseja sair da aplicação?</string>
     <string name="cancel">Cancelar</string>
     <string name="sair">Sair</string>
-
+    <string name="confirma">Confirma</string>
+    <string name="titulo_solicita_visita">Solicitação de visita</string>
+    <string name="mensagem_solicita_visita">Você deseja solicitar uma visita do seu gerente? Você será debitado em R$ 50,00. Confirma?</string>
+    <string name="visita_confirmada">Visita confirmada.</string>
 
 </resources>
