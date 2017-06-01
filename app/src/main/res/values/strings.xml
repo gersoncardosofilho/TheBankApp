@@ -1,0 +1,40 @@
+<resources>
+    <string name="app_name">The Bank</string>
+
+    <!--Login page strings-->
+    <string name="prompt_conta_corrente">Conta Corrente</string>
+    <string name="prompt_password">Senha</string>
+    <string name="login">ENTRAR</string>
+
+    <!--Mensagens-->
+    <string name="sem_conexao">Aparelho sem conexão de dados. Favor se conectar para prosseguir.</string>
+    <string name="campo_obrigatorio">Campo obrigatório</string>
+    <string name="permissao_acesso_rede">Favor autorizar o acesso a rede para continuar.</string>
+    <string name="ok">OK</string>
+    <string name="permissao_concedida">Permissão concedida</string>
+    <string name="permissao_negada">Permissão negada</string>
+    <string name="usuario_nao_encontrado">Usuário não encontrado</string>
+    <string name="login_sucesso">Login efetuado com sucesso</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="saudacao">Olá, </string>
+    <string name="saldo_disponivel">SALDO DISPONÍVEL</string>
+
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="saldo_insuficiente">Desculpe, saldo insuficiente.</string>
+    <string name="saque_efetuado_com_sucesso">Saque efetuado com sucesso.</string>
+    <string name="mensagem_titulo">MENSAGEM</string>
+    <string name="deposito_realizado_com_sucesso">Depósito realizado com sucesso.</string>
+    <string name="atencao">ATENÇÃO</string>
+    <string name="mensagem_transferencia_acima_limite">Seu perfil de conta só permite transferências até R$1000,00.</string>
+    <string name="mensagem_transferencia_mesma_conta">Você não pode efetuar transferência para sua própria conta.</string>
+    <string name="mensagem_transferencia_sucesso">Transferência realizada com sucesso.</string>
+
+
+</resources>
