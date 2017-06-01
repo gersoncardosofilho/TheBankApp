@@ -155,14 +155,32 @@ public class Cliente extends RealmObject {
 
         Realm realm = Realm.getDefaultInstance();
         Double saldoAtual = cliente.getSaldo();
+        Double saldoAnterior = saldoAtual;
         saldoAtual = saldoAtual + valorDeposito;
+        Transacao transacao = new Transacao();
+        Calendar calendar = Calendar.getInstance();
+        Date dataTransacao = calendar.getTime();
 
         realm.beginTransaction();
         cliente.setSaldo(saldoAtual);
         realm.commitTransaction();
 
         atualizaSaldoCliente(cliente);
-        //Transacao.adicionaTransacaoBD(cliente, "deposito", valorDeposito);
+
+        //cria objeto transacao
+        realm.beginTransaction();
+        transacao.setId(UUID.randomUUID().toString());
+        transacao.setValorTransacao(valorDeposito);
+        transacao.setTipoTransacao("deposito");
+        transacao.setDataTransacao(dataTransacao);
+        transacao.setContaCorrenteOrigem(cliente.getNumeroConta());
+        transacao.setSaldoAnterior(saldoAnterior);
+        transacao.setSaldoAtual(saldoAtual);
+        realm.commitTransaction();
+        realm.close();
+
+
+        Transacao.adicionaTransacaoBD(cliente, transacao);
 
         return true;
     }
