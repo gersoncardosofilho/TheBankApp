@@ -69,9 +69,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/prompt_conta_corrente"
-                android:inputType="text"
+                android:inputType="number"
                 android:maxLines="1"
-                android:textColor="@color/white" android:text="12345" />
+                android:textColor="@color/white" android:text="12345" android:imeOptions="actionNext" />
 
         </android.support.design.widget.TextInputLayout>
 
@@ -92,8 +92,8 @@
                 android:hint="@string/prompt_password"
                 android:imeActionId="@+id/login"
                 android:imeActionLabel="@string/login"
-                android:imeOptions="actionUnspecified"
-                android:inputType="textPassword"
+                android:imeOptions="actionNext"
+                android:inputType="numberPassword"
                 android:maxLines="1"
                 tools:layout_editor_absoluteX="8dp"
                 tools:layout_editor_absoluteY="59dp" android:text="1234" />
