@@ -21,6 +21,10 @@ import com.desafio.gerson.thebankapp.util.TheBankUtil;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.realm.Realm;
+import io.realm.RealmList;
+import io.realm.RealmQuery;
+import io.realm.RealmResults;
 
 import static java.math.BigDecimal.valueOf;
 
@@ -83,6 +87,11 @@ public class FragmentSaldo extends Fragment {
         saldoNome.setText(cliente.getNome());
         valorSaldo.setText(valueOf(cliente.getSaldo()).toString());
 
+        Realm realm = Realm.getDefaultInstance();
+
+        //RealmList<Cliente> transacoes = cliente.getTransacoes();
+
+        realm.close();
         return view;
     }
 
