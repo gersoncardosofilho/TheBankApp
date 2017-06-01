@@ -2,13 +2,7 @@ package com.desafio.gerson.thebankapp;
 
 import android.app.Application;
 
-import com.desafio.gerson.thebankapp.model.Cliente;
-import com.desafio.gerson.thebankapp.util.PrimaryKeyFactory;
-
-import java.util.concurrent.atomic.AtomicLong;
-
 import io.realm.Realm;
-import io.realm.RealmConfiguration;
 
 /**
  * Created by gerso on 5/24/2017.

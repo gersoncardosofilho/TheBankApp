@@ -40,14 +40,6 @@ public class TheBankUtil {
     public static final String PREFERENCE_NAME = "TheBankPrefs";
 
 
-//
-//    //Atualiza cliente no BD
-//    public static void atualizaSaldoCliente(Cliente cliente) {
-//        Realm realm  = Realm.getDefaultInstance();
-//        realm.beginTransaction();
-//        Cliente c = realm.copyToRealmOrUpdate(cliente);
-//        realm.commitTransaction();
-//    }
 
     public static boolean isNetworkAvailable(Context ctx){
         ConnectivityManager connectivityManager = (ConnectivityManager) ctx.getSystemService(Context.CONNECTIVITY_SERVICE);

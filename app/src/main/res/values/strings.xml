@@ -35,6 +35,10 @@
     <string name="mensagem_transferencia_acima_limite">Seu perfil de conta só permite transferências até R$1000,00.</string>
     <string name="mensagem_transferencia_mesma_conta">Você não pode efetuar transferência para sua própria conta.</string>
     <string name="mensagem_transferencia_sucesso">Transferência realizada com sucesso.</string>
+    <string name="titulo_sair_aplicacao">Sair da aplicação</string>
+    <string name="mensagem_sair_aplicacao">Tem certeza que deseja sair da aplicação?</string>
+    <string name="cancel">Cancelar</string>
+    <string name="sair">Sair</string>
 
 
 </resources>

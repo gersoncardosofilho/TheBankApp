@@ -20,9 +20,9 @@
             android:title="Serviços" />
 
         <item
-            android:id="@+id/nav_muda_usuario"
+            android:id="@+id/nav_sair_do_aplicativo"
             android:icon="@drawable/ic_account_circle_black_24dp"
-            android:title="Muda usuário" />
+            android:title="Sair do aplicativo" />
     </group>
 
 </menu>

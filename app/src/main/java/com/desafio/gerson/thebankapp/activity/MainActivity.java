@@ -1,5 +1,7 @@
 package com.desafio.gerson.thebankapp.activity;
 
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -11,6 +13,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -190,16 +193,59 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             contentFragment = new FragmentServicos();
             contentFragment.setArguments(args);
             switchContent(contentFragment, FragmentServicos.FRAG_ID);
-        } else if (id == R.id.nav_muda_usuario){
+        } else if (id == R.id.nav_sair_do_aplicativo){
 
-            contentFragment = new FragmentMain();
-            contentFragment.setArguments(args);
-            switchContent(contentFragment, FragmentMain.FRAG_ID);
+            logout();
+
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    public void logout()
+    {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setPositiveButton(R.string.sair, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+
+                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                //clear backstack on logout
+                clearBackStack();
+                startActivity(intent);
+            }
+        });
+
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                return;
+            }
+        });
+
+        builder.setTitle(R.string.titulo_sair_aplicacao);
+        builder.setMessage(R.string.mensagem_sair_aplicacao);
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
+    }
+
+    private void clearBackStack() {
+        FragmentManager fm = this.getSupportFragmentManager();
+        if(fm.getBackStackEntryCount()>0)
+        {
+            for(int i = 0; i < fm.getBackStackEntryCount(); ++i) {
+                fm.popBackStack();
+            }
+        }
+        else
+        {
+            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+            startActivity(intent);
+        }
+
     }
 
 
