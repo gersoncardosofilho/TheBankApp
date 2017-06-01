@@ -35,9 +35,6 @@ public class ClienteExtratoAdapter extends RealmBaseAdapter<Transacao> implement
         TextView dataTransacao, descricaoTransacao, valorTransacao;
     }
 
-    private boolean inDeletionMode = false;
-    private Set<Integer> countersToDelete = new HashSet<Integer>();
-
 
     public ClienteExtratoAdapter(Context context, @Nullable OrderedRealmCollection<Transacao> data) {
         super(data);
@@ -49,7 +46,7 @@ public class ClienteExtratoAdapter extends RealmBaseAdapter<Transacao> implement
         ViewHolder viewHolder;
         if (convertView == null){
             convertView = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.list_transacoes, parent, false);
+                    .inflate(R.layout.extrato_row_item, parent, false);
 
             viewHolder = new ViewHolder();
             viewHolder.dataTransacao = (TextView) convertView.findViewById(R.id.textview_extrato_data);
@@ -64,7 +61,8 @@ public class ClienteExtratoAdapter extends RealmBaseAdapter<Transacao> implement
 
             DateFormat df = new SimpleDateFormat("dd/mm");
 
-            String data = df.format(getItem(position).getDataTransacao());
+            String data = DateFormat.getDateInstance(DateFormat.DATE_FIELD, Locale.forLanguageTag("pt-BR)")).format(getItem(position).getDataTransacao());
+            //String data = df.format(getItem(position).getDataTransacao());
             String descricao = getItem(position).getTipoTransacao().toString();
             String valor = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("pt-BR")).format(getItem(position).getValorTransacao());
 
