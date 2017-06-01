@@ -14,8 +14,10 @@ import com.desafio.gerson.thebankapp.R;
 import com.desafio.gerson.thebankapp.model.Transacao;
 
 import java.text.DateFormat;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
 
 import io.realm.OrderedRealmCollection;
@@ -64,21 +66,21 @@ public class ClienteExtratoAdapter extends RealmBaseAdapter<Transacao> implement
 
             String data = df.format(getItem(position).getDataTransacao());
             String descricao = getItem(position).getTipoTransacao().toString();
-            String valor = String.valueOf(getItem(position).getValorTransacao());
+            String valor = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("pt-BR")).format(getItem(position).getValorTransacao());
 
-            String result = null;
+
 
             if (descricao.equals("saque") || descricao.contains("ncia pa") || descricao.contains("taxa")){
                 viewHolder.valorTransacao.setTextColor(ContextCompat.getColor(context, R.color.red));
-                result = String.format("-%1$s", valor);
+
             } else {
                 viewHolder.valorTransacao.setTextColor(ContextCompat.getColor(context, R.color.colorAccent));
-                result = String.format("+%1$s", valor);
+
             }
 
             viewHolder.dataTransacao.setText(data);
             viewHolder.descricaoTransacao.setText(descricao);
-            viewHolder.valorTransacao.setText(result);
+            viewHolder.valorTransacao.setText(valor);
         }
 
         return convertView;

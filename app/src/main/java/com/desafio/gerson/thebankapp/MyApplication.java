@@ -1,6 +1,7 @@
 package com.desafio.gerson.thebankapp;
 
 import android.app.Application;
+import android.graphics.Typeface;
 
 import io.realm.Realm;
 
@@ -37,6 +38,7 @@ public class MyApplication extends Application {
 //        pkf.initialize(realm);
 //
 //        realm.close();
+
 //
   }
 

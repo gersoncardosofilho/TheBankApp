@@ -18,8 +18,10 @@ import com.desafio.gerson.thebankapp.model.Cliente;
 import com.desafio.gerson.thebankapp.model.Transacao;
 import com.desafio.gerson.thebankapp.util.TheBankUtil;
 
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import io.realm.RealmResults;
 
@@ -32,6 +34,10 @@ public class FragmentExtrato extends Fragment {
 
     private Bundle args;
     private String mContaCorrente;
+
+    NumberFormat nf = NumberFormat.getCurrencyInstance();
+
+
 
     public FragmentExtrato() {
         // Required empty public constructor
@@ -55,9 +61,12 @@ public class FragmentExtrato extends Fragment {
         View view = inflater.inflate(R.layout.fragment_extrato, container, false);
         ListView listView = (ListView) view.findViewById(R.id.list_transacoes);
         Cliente cliente = Cliente.getClienteByContaCorrente(mContaCorrente);
+        TextView textviewSaldoAtual = (TextView) view.findViewById(R.id.textview_extrato_saldoatual);
+        String saldoAtual = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("pt-BR")).format(cliente.getSaldo());
 
         RealmResults<Transacao> transacoes = (RealmResults<Transacao>) Cliente.listaExtratoCliente(cliente);
         listView.setAdapter(new ClienteExtratoAdapter(getContext(), transacoes));
+        textviewSaldoAtual.setText(saldoAtual);
 
         return view;
     }
