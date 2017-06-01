@@ -203,16 +203,49 @@ public class Cliente extends RealmObject {
     public static void executaTransferenciaEntreContas(Double valorASerTransferido, String contaDestino, Cliente cliente){
 
         Realm realm = Realm.getDefaultInstance();
+        Transacao transacaoOrigem = new Transacao();
+        Transacao transacaoDestino = new Transacao();
+        Calendar calendar = Calendar.getInstance();
+        Date dataTransacao = calendar.getTime();
+        double saldoOrigemAtual = cliente.getSaldo() - valorASerTransferido;
+        String tipoTransacaoOrigem = "transferencia p/ CC " + contaDestino;
+        String tipoTransacaoDestino = "transferencia da CC " + cliente.getNumeroConta();
 
         Cliente clienteDestino = getClienteByContaCorrente(contaDestino);
+        double saldoDestinoAtual = clienteDestino.getSaldo() + valorASerTransferido;
         executaDepositoCliente(valorASerTransferido, clienteDestino);
         debitaContaCliente(cliente, valorASerTransferido);
 
-        String tipoTransacaoOrigem = "transfencia p/ CC " + contaDestino;
-        String tipoTransacaoDestino = "transferencia da CC " + cliente.getNumeroConta();
+        //cria objeto transacao cliente origem
+        realm.beginTransaction();
+        transacaoOrigem.setId(UUID.randomUUID().toString());
+        transacaoOrigem.setValorTransacao(valorASerTransferido);
+        transacaoOrigem.setTipoTransacao(tipoTransacaoOrigem);
+        transacaoOrigem.setDataTransacao(dataTransacao);
+        transacaoOrigem.setContaCorrenteOrigem(cliente.getNumeroConta());
+        transacaoOrigem.setSaldoAnterior(cliente.getSaldo());
+        transacaoOrigem.setSaldoAtual(saldoOrigemAtual);
+        transacaoOrigem.setContaCorrenteDestino(contaDestino);
+        realm.commitTransaction();
+        realm.close();
 
-        //Transacao.adicionaTransacaoBD(cliente, tipoTransacaoOrigem, valorASerTransferido);
-        //Transacao.adicionaTransacaoBD(clienteDestino, tipoTransacaoDestino, valorASerTransferido);
+
+        //cria objeto transacao cliente destino
+        realm.beginTransaction();
+        transacaoDestino.setId(UUID.randomUUID().toString());
+        transacaoDestino.setValorTransacao(valorASerTransferido);
+        transacaoDestino.setTipoTransacao(tipoTransacaoDestino);
+        transacaoDestino.setDataTransacao(dataTransacao);
+        transacaoDestino.setContaCorrenteOrigem(cliente.getNumeroConta());
+        transacaoDestino.setSaldoAnterior(clienteDestino.getSaldo());
+        transacaoDestino.setSaldoAtual(saldoDestinoAtual);
+        transacaoDestino.setContaCorrenteDestino(contaDestino);
+        realm.commitTransaction();
+        realm.close();
+
+
+        Transacao.adicionaTransacaoBD(cliente, transacaoOrigem);
+        Transacao.adicionaTransacaoBD(clienteDestino, transacaoDestino);
     }
 
     public static List<Transacao> listaExtratoCliente(final Cliente cliente){
