@@ -85,7 +85,7 @@ public class FragmentTransacaoSaque extends Fragment implements View.OnClickList
 
         Double valorSaque = Double.parseDouble(edittextSaqueValor.getText().toString());
 
-        response = Cliente.executaSaqueCliente(activity, cliente, valorSaque);
+        response = Cliente.executaSaqueCliente("saque", cliente, valorSaque);
 
         if (response){
             String titulo =(String) activity.getResources().getText(R.string.mensagem_titulo);

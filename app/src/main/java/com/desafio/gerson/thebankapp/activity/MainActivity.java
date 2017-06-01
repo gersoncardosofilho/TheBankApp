@@ -27,6 +27,7 @@ import com.desafio.gerson.thebankapp.fragment.FragmentExtrato;
 import com.desafio.gerson.thebankapp.fragment.FragmentMain;
 import com.desafio.gerson.thebankapp.fragment.FragmentSaldo;
 import com.desafio.gerson.thebankapp.fragment.FragmentServicos;
+import com.desafio.gerson.thebankapp.fragment.FragmentTransacaoSaque;
 import com.desafio.gerson.thebankapp.fragment.FragmentTransacoes;
 import com.desafio.gerson.thebankapp.model.Cliente;
 import com.desafio.gerson.thebankapp.util.TheBankUtil;
@@ -43,7 +44,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     Cliente cliente;
     String contaCorrente;
     String perfil;
-    
+
 
     Bundle args = new Bundle();
 
@@ -268,7 +269,25 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
 
-                    Snackbar.make(getWindow().getDecorView().getRootView(), R.string.visita_confirmada, Snackbar.LENGTH_SHORT).show();
+                    Realm realm = Realm.getDefaultInstance();
+                    Cliente cliente = Cliente.getClienteByContaCorrente(contaCorrente);
+
+                    realm.beginTransaction();
+                    double saldoAnterior = cliente.getSaldo();
+                    double valorADebitar = 50.00;
+                    double saldoAtual = saldoAnterior - valorADebitar;
+
+                    realm.commitTransaction();
+
+                    boolean response = Cliente.executaSaqueCliente("taxa solic. visita",cliente, valorADebitar);
+
+                    if (response){
+                        Snackbar.make(getWindow().getDecorView().getRootView(), R.string.visita_confirmada, Snackbar.LENGTH_SHORT).show();
+
+                        contentFragment = new FragmentSaldo();
+                        contentFragment.setArguments(args);
+                        switchContent(contentFragment, FragmentSaldo.FRAG_ID);
+                    }
                 }
             });
 

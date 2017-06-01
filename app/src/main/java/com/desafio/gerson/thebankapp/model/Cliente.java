@@ -1,5 +1,6 @@
 package com.desafio.gerson.thebankapp.model;
 
+import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.v4.app.FragmentActivity;
@@ -78,7 +79,7 @@ public class Cliente extends RealmObject {
         realm.commitTransaction();
     }
 
-    public static boolean executaSaqueCliente(FragmentActivity activity, Cliente cliente, Double valorSaque){
+    public static boolean executaSaqueCliente(String tipoTransacao, Cliente cliente, Double valorSaque){
 
         Calendar calendar = Calendar.getInstance();
         Realm realm = Realm.getDefaultInstance();
@@ -104,7 +105,7 @@ public class Cliente extends RealmObject {
                 realm.beginTransaction();
                 transacao.setId(UUID.randomUUID().toString());
                 transacao.setValorTransacao(valorSaque);
-                transacao.setTipoTransacao("saque");
+                transacao.setTipoTransacao(tipoTransacao);
                 transacao.setDataTransacao(dataSaque);
                 transacao.setContaCorrenteOrigem(cliente.getNumeroConta());
                 transacao.setSaldoAnterior(saldoAnterior);
@@ -121,8 +122,7 @@ public class Cliente extends RealmObject {
                 return false;
             }
         }else{
-                //withdraw vip client
-            Date dataCorrente = calendar.getTime();
+            //withdraw vip client
             saldoAtual = saldoAtual - valorSaque;
 
             realm.beginTransaction();
@@ -135,7 +135,7 @@ public class Cliente extends RealmObject {
             realm.beginTransaction();
             transacao.setId(UUID.randomUUID().toString());
             transacao.setValorTransacao(valorSaque);
-            transacao.setTipoTransacao("saque");
+            transacao.setTipoTransacao(tipoTransacao);
             transacao.setDataTransacao(dataSaque);
             transacao.setContaCorrenteOrigem(cliente.getNumeroConta());
             transacao.setSaldoAnterior(saldoAnterior);
@@ -150,6 +150,7 @@ public class Cliente extends RealmObject {
 
         }
     }
+
 
     public static boolean executaDepositoCliente(Double valorDeposito, Cliente cliente){
 
