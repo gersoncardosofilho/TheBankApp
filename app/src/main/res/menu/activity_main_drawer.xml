@@ -14,10 +14,6 @@
             android:id="@+id/nav_transacoes"
             android:icon="@drawable/ic_swap_horiz_black_24dp"
             android:title="Transações" />
-        <item
-            android:id="@+id/nav_servicos"
-            android:icon="@drawable/ic_list_black_24dp"
-            android:title="Serviços" />
 
         <item
             android:id="@+id/nav_sair_do_aplicativo"

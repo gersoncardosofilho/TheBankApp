@@ -6,6 +6,7 @@ import android.content.Context;
 import android.os.Bundle;
 
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -41,6 +42,8 @@ public class FragmentSaldo extends Fragment {
     private Bundle args;
     private String mContaCorrente;
 
+    private FloatingActionButton fab;
+
     Cliente cliente;
 
     FragmentActivity activity;
@@ -65,17 +68,22 @@ public class FragmentSaldo extends Fragment {
         args = getArguments();
         mContaCorrente = args.getString("contacorrente");
 
+
+
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ((MainActivity) getActivity()).setActionBarTitle(FRAG_ID);
+
+
         activity = getActivity();
 
 
 
     }
+
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,

@@ -1,6 +1,5 @@
 package com.desafio.gerson.thebankapp.activity;
 
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -24,17 +23,12 @@ import android.view.View;
 
 import com.desafio.gerson.thebankapp.R;
 import com.desafio.gerson.thebankapp.fragment.FragmentExtrato;
-import com.desafio.gerson.thebankapp.fragment.FragmentMain;
 import com.desafio.gerson.thebankapp.fragment.FragmentSaldo;
-import com.desafio.gerson.thebankapp.fragment.FragmentServicos;
-import com.desafio.gerson.thebankapp.fragment.FragmentTransacaoSaque;
 import com.desafio.gerson.thebankapp.fragment.FragmentTransacoes;
 import com.desafio.gerson.thebankapp.model.Cliente;
 import com.desafio.gerson.thebankapp.util.TheBankUtil;
 
 import io.realm.Realm;
-import io.realm.RealmQuery;
-import io.realm.RealmResults;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -45,6 +39,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     String contaCorrente;
     String perfil;
 
+    FloatingActionButton fab;
+
+    public FloatingActionButton getFab() {
+        return fab;
+    }
 
     Bundle args = new Bundle();
 
@@ -77,7 +76,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab = (FloatingActionButton) findViewById(R.id.fab);
 
         if(cliente.getPerfil().equals("vip")){
             fab.setVisibility(View.VISIBLE);
@@ -202,11 +201,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             //switchContent(contentFragment, FragmentTransacoes.FRAG_ID);
             TheBankUtil.switchContent(this, contentFragment, FragmentTransacoes.FRAG_ID);
 
-        } else if (id == R.id.nav_servicos) {
-
-            contentFragment = new FragmentServicos();
-            contentFragment.setArguments(args);
-            switchContent(contentFragment, FragmentServicos.FRAG_ID);
         } else if (id == R.id.nav_sair_do_aplicativo){
 
             logout();
@@ -217,6 +211,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+
+
 
     public void logout()
     {

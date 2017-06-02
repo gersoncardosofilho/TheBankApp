@@ -4,6 +4,7 @@ package com.desafio.gerson.thebankapp.fragment;
 import android.os.Bundle;
 
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,6 +35,7 @@ public class FragmentExtrato extends Fragment {
 
     private Bundle args;
     private String mContaCorrente;
+    private FloatingActionButton fab;
 
     NumberFormat nf = NumberFormat.getCurrencyInstance();
 
@@ -47,6 +49,14 @@ public class FragmentExtrato extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ((MainActivity) getActivity()).setActionBarTitle(FRAG_ID);
+
+        ((MainActivity) getActivity()).setActionBarTitle(FRAG_ID);
+        fab = ((MainActivity) getActivity()).getFab();
+
+        //hides fab in fragments
+        if (fab!= null){
+            fab.setVisibility(View.INVISIBLE);
+        }
 
         args = getArguments();
         mContaCorrente = args.getString("contacorrente");

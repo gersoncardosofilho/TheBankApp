@@ -14,8 +14,12 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.desafio.gerson.thebankapp.R;
+import com.desafio.gerson.thebankapp.activity.MainActivity;
 import com.desafio.gerson.thebankapp.model.Cliente;
 import com.desafio.gerson.thebankapp.util.TheBankUtil;
+
+import java.text.NumberFormat;
+import java.util.Locale;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -48,6 +52,8 @@ public class FragmentTransacaoDeposito extends Fragment implements View.OnClickL
 
         activity = getActivity();
 
+        ((MainActivity) getActivity()).setActionBarTitle("Depósito");
+
         args = getArguments();
         mContaCorrente = args.getString("contacorrente");
         contentFragmentArgs = args;
@@ -66,7 +72,10 @@ public class FragmentTransacaoDeposito extends Fragment implements View.OnClickL
         buttonConfirmaDeposito = (Button) view.findViewById(R.id.btn_deposito_confirma);
 
         cliente = Cliente.getClienteByContaCorrente(mContaCorrente);
-        textviewDepositoSaldo.setText(new Double(cliente.getSaldo()).toString());
+
+        String saldoAtual = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("pt-BR")).format(cliente.getSaldo());
+
+        textviewDepositoSaldo.setText(saldoAtual);
 
         buttonConfirmaDeposito.setOnClickListener(this);
 
