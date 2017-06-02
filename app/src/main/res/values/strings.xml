@@ -8,6 +8,7 @@
 
     <!--Mensagens-->
     <string name="sem_conexao">Aparelho sem conexão de dados. Favor se conectar para prosseguir.</string>
+    <string name="falha_na_conexao">Falha na conexão, tente novamente</string>
     <string name="campo_obrigatorio">Campo obrigatório</string>
     <string name="permissao_acesso_rede">Favor autorizar o acesso a rede para continuar.</string>
     <string name="ok">OK</string>

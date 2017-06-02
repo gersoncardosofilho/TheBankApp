@@ -18,9 +18,12 @@ import android.widget.TextView;
 import com.desafio.gerson.thebankapp.R;
 import com.desafio.gerson.thebankapp.activity.MainActivity;
 import com.desafio.gerson.thebankapp.model.Cliente;
+import com.desafio.gerson.thebankapp.model.Transacao;
 import com.desafio.gerson.thebankapp.util.TheBankUtil;
 
 import java.text.NumberFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 
 import io.realm.Realm;
@@ -94,10 +97,29 @@ public class FragmentTransacaoSaque extends Fragment implements View.OnClickList
         boolean response;
 
         Double valorSaque = Double.parseDouble(edittextSaqueValor.getText().toString());
+        String tipoTransacao = "saque";
+        Date dataTransacao = Calendar.getInstance().getTime();
+        Double valorAtualizado = cliente.getSaldo() + valorSaque;
 
-        response = Cliente.executaSaqueCliente("saque", cliente, valorSaque);
+        response = Cliente.debitaContaCliente(cliente, valorSaque);
 
         if (response){
+            //cria objeto transacao origem
+            Realm realm = Realm.getDefaultInstance();
+            realm.beginTransaction();
+            Transacao transacaoOrigem = new Transacao(
+                    tipoTransacao,
+                    valorSaque,
+                    valorAtualizado,
+                    cliente.getSaldo(),
+                    dataTransacao,
+                    cliente.getNumeroConta(),
+                    null);
+            realm.commitTransaction();
+            realm.close();
+
+            Transacao.adicionaTransacaoBD(cliente, transacaoOrigem);
+
             String titulo =(String) activity.getResources().getText(R.string.mensagem_titulo);
             String mensagem =(String) activity.getResources().getText(R.string.saque_efetuado_com_sucesso);
 

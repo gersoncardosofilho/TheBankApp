@@ -4,6 +4,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.StyleRes;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -26,7 +27,12 @@ import com.desafio.gerson.thebankapp.fragment.FragmentExtrato;
 import com.desafio.gerson.thebankapp.fragment.FragmentSaldo;
 import com.desafio.gerson.thebankapp.fragment.FragmentTransacoes;
 import com.desafio.gerson.thebankapp.model.Cliente;
+import com.desafio.gerson.thebankapp.model.Transacao;
 import com.desafio.gerson.thebankapp.util.TheBankUtil;
+
+import java.util.Calendar;
+import java.util.Date;
+import java.util.UUID;
 
 import io.realm.Realm;
 
@@ -38,6 +44,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     Cliente cliente;
     String contaCorrente;
     String perfil;
+    Calendar calendar = Calendar.getInstance();
 
     FloatingActionButton fab;
 
@@ -62,15 +69,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         args.putString("contacorrente", contaCorrente);
 
+
+
+
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
         if (perfil.equals("normal")){
             setTheme(R.style.perfil_normal);
         } else {
             setTheme(R.style.perfil_vip);
         }
-
-
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
 
         cliente = Cliente.getClienteByContaCorrente(contaCorrente);
 
@@ -88,8 +97,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                 }
             });
-
-
 
         } else {
             fab.setVisibility(View.INVISIBLE);
@@ -269,13 +276,30 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     Cliente cliente = Cliente.getClienteByContaCorrente(contaCorrente);
 
                     realm.beginTransaction();
-                    double saldoAnterior = cliente.getSaldo();
+                    double saldoAtual = cliente.getSaldo();
                     double valorADebitar = 50.00;
-                    double saldoAtual = saldoAnterior - valorADebitar;
+                    String tipoTransacao = "taxa solic. visita";
+                    Date dataTransacao = calendar.getTime();
+                    double saldoAtualizado = saldoAtual - valorADebitar;
 
                     realm.commitTransaction();
 
-                    boolean response = Cliente.executaSaqueCliente("taxa solic. visita",cliente, valorADebitar);
+                    boolean response = Cliente.debitaContaCliente(cliente, valorADebitar);
+
+                    //cria objeto transacao origem
+                    realm.beginTransaction();
+                    Transacao transacaoOrigem = new Transacao(
+                            tipoTransacao,
+                            valorADebitar,
+                            saldoAtual,
+                            saldoAtualizado,
+                            dataTransacao,
+                            cliente.getNumeroConta(),
+                            cliente.getNumeroConta());
+                    realm.commitTransaction();
+                    realm.close();
+
+                    Transacao.adicionaTransacaoBD(cliente, transacaoOrigem);
 
                     if (response){
                         Snackbar.make(getWindow().getDecorView().getRootView(), R.string.visita_confirmada, Snackbar.LENGTH_SHORT).show();
@@ -300,7 +324,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             dialog.show();
         }
     }
-
 
 }
 

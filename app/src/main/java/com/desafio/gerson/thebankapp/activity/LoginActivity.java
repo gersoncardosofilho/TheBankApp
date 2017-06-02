@@ -114,57 +114,54 @@ public class LoginActivity extends AppCompatActivity {
     private Callback<Cliente> loginCallback = new Callback<Cliente>() {
         @Override
         public void onResponse(Call<Cliente> call, final Response<Cliente> response) {
-            //login succeeded logic
-            Toast.makeText(getApplicationContext(), R.string.login_sucesso, Toast.LENGTH_SHORT).show();
+
 
             int statusCode = response.code();
             final Cliente clienteResponse = response.body();
             //status code 200 = success operation
             //open mainactivity passing user
 
-            if(statusCode == 200)
-            {
-                Log.d(TAG,"Login realizado com sucesso");
-                progressBar.setVisibility(View.GONE);
+            if(statusCode == 200){
+                if (clienteResponse == null){
+                    progressBar.setVisibility(View.GONE);
+                    Snackbar.make(root, R.string.usuario_nao_encontrado, Snackbar.LENGTH_LONG).show();
+                    return;
+                }  else {
+                    Log.d(TAG,"Login realizado com sucesso");
+                    progressBar.setVisibility(View.GONE);
 
-                //Checks for client
+                    //login succeeded logic
+                    Toast.makeText(getApplicationContext(), R.string.login_sucesso, Toast.LENGTH_SHORT).show();
 
-                cliente = Cliente.getClienteByContaCorrente(clienteResponse.getNumeroConta());
+                    cliente = Cliente.getClienteByContaCorrente(clienteResponse.getNumeroConta());
 
-                // if client do not exists save him to db else, move on
-                if (cliente == null){
-                    realm = Realm.getDefaultInstance();
-                    realm.beginTransaction();
-                        Cliente newCliente = new Cliente();
-                        newCliente.setNome(clienteResponse.getNome());
-                        newCliente.setCpf(clienteResponse.getCpf());
-                        newCliente.setId(UUID.randomUUID().toString());
-                        newCliente.setNumeroAgencia(clienteResponse.getNumeroAgencia());
-                        newCliente.setPerfil(clienteResponse.getPerfil());
-                        newCliente.setSenha(clienteResponse.getSenha());
-                        newCliente.setSaldo(clienteResponse.getSaldo());
-                        newCliente.setNumeroConta(clienteResponse.getNumeroConta());
-                    realm.commitTransaction();
-                    realm.close();
+                    // if client do not exists save him to db else, move on
+                    if (cliente == null){
+                        realm = Realm.getDefaultInstance();
+                        realm.beginTransaction();
+                        Cliente newCliente = new Cliente(
+                                clienteResponse.getNome(),
+                                clienteResponse.getSenha(),
+                                clienteResponse.getPerfil(),
+                                clienteResponse.getCpf(),
+                                clienteResponse.getSaldo(),
+                                clienteResponse.getNumeroConta(),
+                                clienteResponse.getNumeroAgencia());
+                        realm.commitTransaction();
+                        realm.close();
 
-                    Cliente.addCliente(newCliente);
-                }
+                        Cliente.addCliente(newCliente);
+                    }
                     Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                     intent.putExtra("contacorrente", clienteResponse.getNumeroConta());
                     intent.putExtra("perfil", clienteResponse.getPerfil());
                     startActivity(intent);
-            }
-            //status code 400 = invalid username/password suplied
-            //launch snackbar with invalid username/password message
-            else if(statusCode == 404){
-                progressBar.setVisibility(View.GONE);
-                Snackbar.make(root, R.string.usuario_nao_encontrado, Snackbar.LENGTH_LONG).show();
+                }
             } else {
                 progressBar.setVisibility(View.GONE);
-                Toast.makeText(LoginActivity.this, R.string.sem_conexao, Toast.LENGTH_LONG).show();
-                return;
-            }
+                Toast.makeText(LoginActivity.this, R.string.usuario_nao_encontrado, Toast.LENGTH_LONG).show();
 
+            }
         }
 
         @Override

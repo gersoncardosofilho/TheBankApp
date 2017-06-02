@@ -22,9 +22,6 @@ public class TheBankUnitTest {
         assertEquals(4, 2 + 2);
     }
 
-
-
-
     @Test
     public void TestaSaqueClienteNormal(){
 
@@ -39,7 +36,7 @@ public class TheBankUnitTest {
         cliente.setNumeroConta("12345");
         cliente.setSenha("Cliente senha");
 
-        success = Cliente.executaSaqueCliente(null, cliente, 2000.00);
+        //success = Cliente.executaSaqueCliente(null, cliente, 2000.00);
 
         assertTrue("saldo insuficiente", false);
     }

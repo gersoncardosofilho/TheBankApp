@@ -2,11 +2,12 @@
 <resources>
     <color name="colorPrimary">#ff7506</color>
     <color name="colorPrimaryDark">#693002</color>
-    <color name="colorAccent">#007F90</color>
+    <color name="colorAccent">#03515b</color>
     <color name="white">#FFFFFF</color>
     <color name="black">#001017</color>
     <color name="loginBox">#D79460</color>
     <color name="user_list">#fff9bc</color>
     <color name="red">#ff0000</color>
     <color name="colorPrimaryLight">#3bff7506</color>
+    <color name="primary_dark_material_light">#d5d5d5</color>
 </resources>

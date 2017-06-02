@@ -72,85 +72,12 @@ public class Cliente extends RealmObject {
 
 
     //Atualiza cliente no BD
-    public static void atualizaSaldoCliente(Cliente clienteNovoSaldo) {
+    public static void atualizaSaldoCliente(Cliente cliente) {
         Realm realm  = Realm.getDefaultInstance();
         realm.beginTransaction();
-        Cliente c = realm.copyToRealmOrUpdate(clienteNovoSaldo);
+        Cliente c = realm.copyToRealmOrUpdate(cliente);
         realm.commitTransaction();
     }
-
-    public static boolean executaSaqueCliente(String tipoTransacao, Cliente cliente, Double valorSaque){
-
-        Calendar calendar = Calendar.getInstance();
-        Realm realm = Realm.getDefaultInstance();
-        Transacao transacao = new Transacao();
-        Double saldoAnterior;
-        Double saldoAtual = cliente.getSaldo();
-        Date dataSaque = calendar.getTime();
-
-        saldoAnterior = saldoAtual;
-
-        if(cliente.getPerfil().equals("normal")){
-            if (saldoAtual > 0 && (saldoAtual - valorSaque > 0)){
-                //withdraw normal client
-                saldoAtual = saldoAtual - valorSaque;
-
-                realm.beginTransaction();
-                cliente.setSaldo(saldoAtual);
-                realm.commitTransaction();
-
-                atualizaSaldoCliente(cliente);
-
-                //cria objeto transacao
-                realm.beginTransaction();
-                transacao.setId(UUID.randomUUID().toString());
-                transacao.setValorTransacao(valorSaque);
-                transacao.setTipoTransacao(tipoTransacao);
-                transacao.setDataTransacao(dataSaque);
-                transacao.setContaCorrenteOrigem(cliente.getNumeroConta());
-                transacao.setSaldoAnterior(saldoAnterior);
-                transacao.setSaldoAtual(saldoAtual);
-                realm.commitTransaction();
-                realm.close();
-
-                Transacao.adicionaTransacaoBD(cliente, transacao);
-
-                return true;
-
-            } else {
-
-                return false;
-            }
-        }else{
-            //withdraw vip client
-            saldoAtual = saldoAtual - valorSaque;
-
-            realm.beginTransaction();
-            cliente.setSaldo(saldoAtual);
-            realm.commitTransaction();
-
-            atualizaSaldoCliente(cliente);
-
-            //cria objeto transacao
-            realm.beginTransaction();
-            transacao.setId(UUID.randomUUID().toString());
-            transacao.setValorTransacao(valorSaque);
-            transacao.setTipoTransacao(tipoTransacao);
-            transacao.setDataTransacao(dataSaque);
-            transacao.setContaCorrenteOrigem(cliente.getNumeroConta());
-            transacao.setSaldoAnterior(saldoAnterior);
-            transacao.setSaldoAtual(saldoAtual);
-            realm.commitTransaction();
-            realm.close();
-
-
-            Transacao.adicionaTransacaoBD(cliente, transacao);
-
-            return true;
-
-        }
-    }
-
 
     public static boolean executaDepositoCliente(Double valorDeposito, Cliente cliente){
 
@@ -168,86 +95,100 @@ public class Cliente extends RealmObject {
 
         atualizaSaldoCliente(cliente);
 
-        //cria objeto transacao
-        realm.beginTransaction();
-        transacao.setId(UUID.randomUUID().toString());
-        transacao.setValorTransacao(valorDeposito);
-        transacao.setTipoTransacao("deposito");
-        transacao.setDataTransacao(dataTransacao);
-        transacao.setContaCorrenteOrigem(cliente.getNumeroConta());
-        transacao.setSaldoAnterior(saldoAnterior);
-        transacao.setSaldoAtual(saldoAtual);
-        realm.commitTransaction();
-        realm.close();
-
-
-        Transacao.adicionaTransacaoBD(cliente, transacao);
-
         return true;
     }
 
-    public static void debitaContaCliente(final Cliente cliente, Double valorADebitar){
+    public static boolean debitaContaCliente(final Cliente cliente, Double valorADebitar){
 
         Realm realm = Realm.getDefaultInstance();
+        Double saldoAtual = cliente.getSaldo();
 
-        final Double novoSaldo = cliente.getSaldo() - valorADebitar;
+        if(cliente.getPerfil().equals("normal")){
+            if (saldoAtual > 0 && (saldoAtual - valorADebitar > 0)){
+                //withdraw normal client
+                saldoAtual = saldoAtual - valorADebitar;
 
-        realm.executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                cliente.setSaldo(novoSaldo);
+                realm.beginTransaction();
+                cliente.setSaldo(saldoAtual);
+                realm.commitTransaction();
+
+                atualizaSaldoCliente(cliente);
+
+                return true;
+
+            } else {
+
+                return false;
             }
-        });
+        }else{
+            //withdraw vip client
+            saldoAtual = saldoAtual - valorADebitar;
 
+            realm.beginTransaction();
+            cliente.setSaldo(saldoAtual);
+            realm.commitTransaction();
+
+            atualizaSaldoCliente(cliente);
+
+            return true;
+
+        }
     }
 
-    public static void executaTransferenciaEntreContas(Double valorASerTransferido, String contaDestino, Cliente cliente){
-
-        Realm realm = Realm.getDefaultInstance();
-        Transacao transacaoOrigem = new Transacao();
-        Transacao transacaoDestino = new Transacao();
-        Calendar calendar = Calendar.getInstance();
-        Date dataTransacao = calendar.getTime();
-        double saldoOrigemAtual = cliente.getSaldo() - valorASerTransferido;
-        String tipoTransacaoOrigem = "transferencia p/ CC " + contaDestino;
-        String tipoTransacaoDestino = "transferencia da CC " + cliente.getNumeroConta();
-
-        Cliente clienteDestino = getClienteByContaCorrente(contaDestino);
-        double saldoDestinoAtual = clienteDestino.getSaldo() + valorASerTransferido;
-        executaDepositoCliente(valorASerTransferido, clienteDestino);
-        debitaContaCliente(cliente, valorASerTransferido);
-
-        //cria objeto transacao cliente origem
-        realm.beginTransaction();
-        transacaoOrigem.setId(UUID.randomUUID().toString());
-        transacaoOrigem.setValorTransacao(valorASerTransferido);
-        transacaoOrigem.setTipoTransacao(tipoTransacaoOrigem);
-        transacaoOrigem.setDataTransacao(dataTransacao);
-        transacaoOrigem.setContaCorrenteOrigem(cliente.getNumeroConta());
-        transacaoOrigem.setSaldoAnterior(cliente.getSaldo());
-        transacaoOrigem.setSaldoAtual(saldoOrigemAtual);
-        transacaoOrigem.setContaCorrenteDestino(contaDestino);
-        realm.commitTransaction();
-        realm.close();
-
-
-        //cria objeto transacao cliente destino
-        realm.beginTransaction();
-        transacaoDestino.setId(UUID.randomUUID().toString());
-        transacaoDestino.setValorTransacao(valorASerTransferido);
-        transacaoDestino.setTipoTransacao(tipoTransacaoDestino);
-        transacaoDestino.setDataTransacao(dataTransacao);
-        transacaoDestino.setContaCorrenteOrigem(cliente.getNumeroConta());
-        transacaoDestino.setSaldoAnterior(clienteDestino.getSaldo());
-        transacaoDestino.setSaldoAtual(saldoDestinoAtual);
-        transacaoDestino.setContaCorrenteDestino(contaDestino);
-        realm.commitTransaction();
-        realm.close();
-
-
-        Transacao.adicionaTransacaoBD(cliente, transacaoOrigem);
-        Transacao.adicionaTransacaoBD(clienteDestino, transacaoDestino);
+    public static boolean eValido(String numeroConta){
+        Cliente response = Cliente.getClienteByContaCorrente(numeroConta);
+        if (response != null){
+            return true;
+        } else {
+            return false;
+        }
     }
+
+//    public static void executaTransferenciaEntreContas(Double valorASerTransferido, String contaDestino, Cliente cliente){
+//
+//        Realm realm = Realm.getDefaultInstance();
+//
+//
+//        Calendar calendar = Calendar.getInstance();
+//        Date dataTransacao = calendar.getTime();
+//        double saldoOrigemAtual = cliente.getSaldo() - valorASerTransferido;
+//
+//        Cliente clienteDestino = getClienteByContaCorrente(contaDestino);
+//        double saldoDestinoAtual = clienteDestino.getSaldo() + valorASerTransferido;
+//        executaDepositoCliente(valorASerTransferido, clienteDestino);
+//        debitaContaCliente(cliente, valorASerTransferido);
+//
+//        //cria objeto transacao cliente origem
+//        realm.beginTransaction();
+//        Transacao transacaoOrigem = new Transacao(
+//                tipoTransacaoOrigem,
+//                cliente.getSaldo(),
+//                valorASerTransferido,
+//                saldoOrigemAtual,
+//                dataTransacao,
+//                cliente.getNumeroConta(),
+//                contaDestino);
+//        realm.commitTransaction();
+//        realm.close();
+//
+//
+//        //cria objeto transacao cliente destino
+//        realm.beginTransaction();
+//        Transacao transacaoDestino = new Transacao(
+//                tipoTransacaoDestino,
+//                clienteDestino.getSaldo(),
+//                valorASerTransferido,
+//                saldoDestinoAtual,
+//                dataTransacao,
+//                cliente.getNumeroConta(),
+//                clienteDestino.getNumeroConta());
+//        realm.commitTransaction();
+//        realm.close();
+//
+//
+//        Transacao.adicionaTransacaoBD(cliente, transacaoOrigem);
+//        Transacao.adicionaTransacaoBD(clienteDestino, transacaoDestino);
+//    }
 
     public static List<Transacao> listaExtratoCliente(final Cliente cliente){
 

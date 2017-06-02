@@ -32,21 +32,33 @@ public class Transacao extends RealmObject {
 
     private String ContaCorrenteDestino;
 
-    private double SaldoAnterior;
+    private double SaldoAtualizado;
 
     private double SaldoAtual;
 
+    public double getSaldoAtualizado() {
+        return SaldoAtualizado;
+    }
+
+    public void setSaldoAtualizado(double saldoAtualizado) {
+        SaldoAtualizado = saldoAtualizado;
+    }
 
     //constructor
     public Transacao(){}
 
-    public Transacao(String tipoTransacao, double saldoAnterior,
-                     double valorTransacao, double saldoAtual,
-                     Date dataTransacao,
-                     String contaCorrenteOrigem,
-                     String contaCorrenteDestino){
+    public Transacao(
+            String tipoTransacao,
+            double valorTransacao,
+            double saldoAtual,
+            double saldoAtualizado,
+            Date dataTransacao,
+            String contaCorrenteOrigem,
+            String contaCorrenteDestino){
         this.Id = UUID.randomUUID().toString();
         this.TipoTransacao = tipoTransacao;
+        this.SaldoAtual = saldoAtual;
+        this.SaldoAtualizado = saldoAtualizado;
         this.ValorTransacao = valorTransacao;
         this.DataTransacao = dataTransacao;
         this.ContaCorrenteOrigem = contaCorrenteOrigem;
@@ -57,13 +69,13 @@ public class Transacao extends RealmObject {
         return Id;
     }
 
-    public double getSaldoAnterior() {
-        return SaldoAnterior;
-    }
-
-    public void setSaldoAnterior(double saldoAnterior) {
-        SaldoAnterior = saldoAnterior;
-    }
+//    public double getSaldoAnterior() {
+//        return SaldoAnterior;
+//    }
+//
+//    public void setSaldoAnterior(double saldoAnterior) {
+//        SaldoAnterior = saldoAnterior;
+//    }
 
     public double getSaldoAtual() {
         return SaldoAtual;
@@ -124,17 +136,13 @@ public class Transacao extends RealmObject {
     public static void adicionaTransacaoBD(final Cliente cliente, final Transacao transacao){
 
         Realm realm = Realm.getDefaultInstance();
-        final Calendar calendar = Calendar.getInstance();
-        final String contaOrigem = cliente.getNumeroConta();
-        final Cliente clienteToUpdate = cliente;
-
 
         realm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
 
                 realm.copyToRealmOrUpdate(transacao);
-                clienteToUpdate.transacoes.add(transacao);
+                cliente.transacoes.add(transacao);
             }
         });
     }

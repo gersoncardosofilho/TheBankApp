@@ -68,8 +68,6 @@ public class FragmentSaldo extends Fragment {
         args = getArguments();
         mContaCorrente = args.getString("contacorrente");
 
-
-
     }
 
     @Override
