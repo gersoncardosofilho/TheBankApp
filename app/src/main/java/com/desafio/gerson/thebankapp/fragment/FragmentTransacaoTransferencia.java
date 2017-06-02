@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -48,7 +49,7 @@ public class FragmentTransacaoTransferencia extends Fragment implements View.OnC
     EditText edittextDepositoValor, editTextDepositoContaDestino;
     Button buttonConfirmaTransferencia;
 
-    View root;
+    View root = null;
 
     public FragmentTransacaoTransferencia() {
         // Required empty public constructor
@@ -91,96 +92,118 @@ public class FragmentTransacaoTransferencia extends Fragment implements View.OnC
 
     @Override
     public void onClick(View v) {
-        Double valorTransferencia = Double.parseDouble(edittextDepositoValor.getText().toString());
-        String contaDestino = editTextDepositoContaDestino.getText().toString();
 
-        if (Cliente.eValido(contaDestino)) {
-            if (cliente.getPerfil().equals("normal")) {
-                //transfer from normal account
-                if (valorTransferencia > 1000) {
-                    String titulo = (String) activity.getResources().getText(R.string.atencao);
-                    String mensagem = (String) activity.getResources().getText(R.string.mensagem_transferencia_acima_limite);
+
+        boolean cancel = false;
+
+        if (TextUtils.isEmpty(edittextDepositoValor.getText().toString())){
+            edittextDepositoValor.setError(getString(R.string.campo_obrigatorio));
+            root = edittextDepositoValor;
+            cancel = true;
+        } else if(TextUtils.isEmpty(editTextDepositoContaDestino.getText().toString())) {
+            editTextDepositoContaDestino.setError(getString(R.string.campo_obrigatorio));
+            root = editTextDepositoContaDestino;
+            cancel = true;
+        }
+
+        if (cancel){
+            root.requestFocus();
+        } else {
+            Double valorTransferencia = Double.parseDouble(edittextDepositoValor.getText().toString());
+            String contaDestino = editTextDepositoContaDestino.getText().toString();
+
+            if (Cliente.eValido(contaDestino)) {
+                if (cliente.getPerfil().equals("normal")) {
+                    //transfer from normal account
+                    if (valorTransferencia > 1000) {
+                        String titulo = (String) activity.getResources().getText(R.string.atencao);
+                        String mensagem = (String) activity.getResources().getText(R.string.mensagem_transferencia_acima_limite);
+
+                        TheBankUtil.alertBuilderTransacoes(activity, titulo, mensagem);
+                    } else if (cliente.getNumeroConta().equals(contaDestino)) {
+                        String titulo = (String) activity.getResources().getText(R.string.atencao);
+                        String mensagem = (String) activity.getResources().getText(R.string.mensagem_transferencia_mesma_conta);
+
+                        TheBankUtil.alertBuilderTransacoes(activity, titulo, mensagem);
+                    } else if(cliente.getSaldo() - valorTransferencia < 0) {
+                        String titulo = (String) activity.getResources().getText(R.string.atencao);
+                        String mensagem = (String) activity.getResources().getText(R.string.saldo_insuficiente);
+
+                        TheBankUtil.alertBuilderTransacoes(activity, titulo, mensagem);
+                        return;
+                    }
+
+                    Double saldoAtualOrigem = cliente.getSaldo();
+                    Double saltoAtualizadoOrigem = saldoAtualOrigem - valorTransferencia;
+                    Date dataTransacao = Calendar.getInstance().getTime();
+                    String tipoTransacaoOrigem = "transferencia p/ CC " + contaDestino;
+                    String tipoTransacaoDestino = "transferencia da CC " + cliente.getNumeroConta();
+                    Realm realm = Realm.getDefaultInstance();
+
+                    Cliente.debitaContaCliente(cliente, valorTransferencia);
+
+                    //cria objeto transacao origem
+                    realm.beginTransaction();
+                    Transacao transacaoOrigem = new Transacao(
+                            tipoTransacaoOrigem,
+                            valorTransferencia,
+                            saldoAtualOrigem,
+                            saltoAtualizadoOrigem,
+                            dataTransacao,
+                            cliente.getNumeroConta(),
+                            contaDestino);
+                    realm.commitTransaction();
+                    realm.close();
+
+                    Transacao.adicionaTransacaoBD(cliente, transacaoOrigem);
+
+                    Cliente clienteDestino = Cliente.getClienteByContaCorrente(contaDestino);
+
+
+                    Double saldoAtualDestino = clienteDestino.getSaldo();
+                    Double saldoAtualizadoDestino = saldoAtualDestino + valorTransferencia;
+
+                    Cliente.executaDepositoCliente(valorTransferencia, clienteDestino);
+
+                    //cria objeto transacao destino
+                    realm.beginTransaction();
+                    Transacao transacaoDestino = new Transacao(
+                            tipoTransacaoDestino,
+                            valorTransferencia,
+                            saldoAtualDestino,
+                            saldoAtualizadoDestino,
+                            dataTransacao,
+                            cliente.getNumeroConta(),
+                            contaDestino);
+                    realm.commitTransaction();
+                    realm.close();
+
+                    Transacao.adicionaTransacaoBD(clienteDestino  , transacaoDestino);
+
+
+                    String titulo = (String) activity.getResources().getText(R.string.mensagem_titulo);
+                    String mensagem = (String) activity.getResources().getText(R.string.mensagem_transferencia_sucesso);
 
                     TheBankUtil.alertBuilderTransacoes(activity, titulo, mensagem);
-                } else if (cliente.getNumeroConta().equals(contaDestino)) {
-                    String titulo = (String) activity.getResources().getText(R.string.atencao);
-                    String mensagem = (String) activity.getResources().getText(R.string.mensagem_transferencia_mesma_conta);
 
-                    TheBankUtil.alertBuilderTransacoes(activity, titulo, mensagem);
-                } else if(cliente.getSaldo() - valorTransferencia < 0) {
-                    String titulo = (String) activity.getResources().getText(R.string.atencao);
-                    String mensagem = (String) activity.getResources().getText(R.string.saldo_insuficiente);
+                    contentFragment = new FragmentSaldo();
+                    contentFragment.setArguments(contentFragmentArgs);
+                    TheBankUtil.switchContent(activity, contentFragment, FragmentTransacaoSaque.FRAG_ID);
 
-                    TheBankUtil.alertBuilderTransacoes(activity, titulo, mensagem);
-                    return;
+                } else {
+                    //transfer from vip account
+
                 }
-
-                Double saldoAtualOrigem = cliente.getSaldo();
-                Double saltoAtualizadoOrigem = saldoAtualOrigem - valorTransferencia;
-                Date dataTransacao = Calendar.getInstance().getTime();
-                String tipoTransacaoOrigem = "transferencia p/ CC " + contaDestino;
-                String tipoTransacaoDestino = "transferencia da CC " + cliente.getNumeroConta();
-                Realm realm = Realm.getDefaultInstance();
-
-                Cliente.debitaContaCliente(cliente, valorTransferencia);
-
-                //cria objeto transacao origem
-                realm.beginTransaction();
-                Transacao transacaoOrigem = new Transacao(
-                        tipoTransacaoOrigem,
-                        valorTransferencia,
-                        saldoAtualOrigem,
-                        saltoAtualizadoOrigem,
-                        dataTransacao,
-                        cliente.getNumeroConta(),
-                        contaDestino);
-                realm.commitTransaction();
-                realm.close();
-
-                Transacao.adicionaTransacaoBD(cliente, transacaoOrigem);
-
-                Cliente clienteDestino = Cliente.getClienteByContaCorrente(contaDestino);
-
-
-                Double saldoAtualDestino = clienteDestino.getSaldo();
-                Double saldoAtualizadoDestino = saldoAtualDestino + valorTransferencia;
-
-                Cliente.executaDepositoCliente(valorTransferencia, clienteDestino);
-
-                //cria objeto transacao destino
-                realm.beginTransaction();
-                Transacao transacaoDestino = new Transacao(
-                        tipoTransacaoDestino,
-                        valorTransferencia,
-                        saldoAtualDestino,
-                        saldoAtualizadoDestino,
-                        dataTransacao,
-                        cliente.getNumeroConta(),
-                        contaDestino);
-                realm.commitTransaction();
-                realm.close();
-
-                Transacao.adicionaTransacaoBD(clienteDestino  , transacaoDestino);
-
-
+            } else {
                 String titulo = (String) activity.getResources().getText(R.string.mensagem_titulo);
-                String mensagem = (String) activity.getResources().getText(R.string.mensagem_transferencia_sucesso);
+                String mensagem = (String) activity.getResources().getText(R.string.usuario_nao_encontrado);
 
                 TheBankUtil.alertBuilderTransacoes(activity, titulo, mensagem);
-
-                contentFragment = new FragmentSaldo();
-                contentFragment.setArguments(contentFragmentArgs);
-                TheBankUtil.switchContent(activity, contentFragment, FragmentTransacaoSaque.FRAG_ID);
-
-            } else {
-                //transfer from vip account
-
             }
-        } else {
-            String titulo = (String) activity.getResources().getText(R.string.mensagem_titulo);
-            String mensagem = (String) activity.getResources().getText(R.string.usuario_nao_encontrado);
-
-            TheBankUtil.alertBuilderTransacoes(activity, titulo, mensagem);
         }
+
+
+
+
     }
 }

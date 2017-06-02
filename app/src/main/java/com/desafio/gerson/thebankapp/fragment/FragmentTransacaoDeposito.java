@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -46,7 +47,7 @@ public class FragmentTransacaoDeposito extends Fragment implements View.OnClickL
     TextView textviewDepositoSaldo;
     EditText  edittextDepositoValor;
     Button buttonConfirmaDeposito;
-    View root;
+    View root = null;
 
     public FragmentTransacaoDeposito() {
         // Required empty public constructor
@@ -91,42 +92,49 @@ public class FragmentTransacaoDeposito extends Fragment implements View.OnClickL
 
     @Override
     public void onClick(View v) {
-        boolean response;
 
-        Double valorDeposito = Double.parseDouble(edittextDepositoValor.getText().toString());
-        String tipoTransacao = "depósito";
-        Date dataTransacao = Calendar.getInstance().getTime();
-        Double saldoAtual = cliente.getSaldo();
-        Double saldoAtualizado = saldoAtual + valorDeposito;
+        if (TextUtils.isEmpty(edittextDepositoValor.getText().toString())) {
+            edittextDepositoValor.setError(getString(R.string.campo_obrigatorio));
+            root = edittextDepositoValor;
+            root.requestFocus();
+        } else {
+            boolean response;
 
-        response = Cliente.executaDepositoCliente(valorDeposito, cliente);
+            Double valorDeposito = Double.parseDouble(edittextDepositoValor.getText().toString());
+            String tipoTransacao = "depósito";
+            Date dataTransacao = Calendar.getInstance().getTime();
+            Double saldoAtual = cliente.getSaldo();
+            Double saldoAtualizado = saldoAtual + valorDeposito;
 
-        //cria objeto transacao origem
-        Realm  realm = Realm.getDefaultInstance();
-        realm.beginTransaction();
-        Transacao transacaoOrigem = new Transacao(
-                tipoTransacao,
-                valorDeposito,
-                saldoAtual,
-                saldoAtualizado,
-                dataTransacao,
-                cliente.getNumeroConta(),
-                null);
-        realm.commitTransaction();
-        realm.close();
+            response = Cliente.executaDepositoCliente(valorDeposito, cliente);
 
-        Transacao.adicionaTransacaoBD(cliente, transacaoOrigem);
+            //cria objeto transacao origem
+            Realm realm = Realm.getDefaultInstance();
+            realm.beginTransaction();
+            Transacao transacaoOrigem = new Transacao(
+                    tipoTransacao,
+                    valorDeposito,
+                    saldoAtual,
+                    saldoAtualizado,
+                    dataTransacao,
+                    cliente.getNumeroConta(),
+                    null);
+            realm.commitTransaction();
+            realm.close();
+
+            Transacao.adicionaTransacaoBD(cliente, transacaoOrigem);
 
 
-        if (response) {
-            String titulo = (String) activity.getResources().getText(R.string.mensagem_titulo);
-            String mensagem = (String) activity.getResources().getText(R.string.saque_efetuado_com_sucesso);
+            if (response) {
+                String titulo = (String) activity.getResources().getText(R.string.mensagem_titulo);
+                String mensagem = (String) activity.getResources().getText(R.string.saque_efetuado_com_sucesso);
 
-            TheBankUtil.alertBuilderTransacoes(activity, titulo, mensagem);
+                TheBankUtil.alertBuilderTransacoes(activity, titulo, mensagem);
 
-            contentFragment = new FragmentSaldo();
-            contentFragment.setArguments(contentFragmentArgs);
-            TheBankUtil.switchContent(activity, contentFragment, FragmentTransacaoSaque.FRAG_ID);
+                contentFragment = new FragmentSaldo();
+                contentFragment.setArguments(contentFragmentArgs);
+                TheBankUtil.switchContent(activity, contentFragment, FragmentTransacaoSaque.FRAG_ID);
+            }
         }
     }
 }

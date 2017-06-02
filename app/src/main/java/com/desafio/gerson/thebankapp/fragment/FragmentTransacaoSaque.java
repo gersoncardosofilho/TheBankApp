@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -47,7 +48,7 @@ public class FragmentTransacaoSaque extends Fragment implements View.OnClickList
     TextView textviewSaqueSaldo;
     EditText  edittextSaqueValor;
     Button buttonConfirmaSaque;
-    View root;
+    View root = null;
 
 
     public FragmentTransacaoSaque() {
@@ -94,46 +95,51 @@ public class FragmentTransacaoSaque extends Fragment implements View.OnClickList
 
     @Override
     public void onClick(View v) {
-        boolean response;
 
-        Double valorSaque = Double.parseDouble(edittextSaqueValor.getText().toString());
-        String tipoTransacao = "saque";
-        Date dataTransacao = Calendar.getInstance().getTime();
-        Double valorAtualizado = cliente.getSaldo() + valorSaque;
+        if (TextUtils.isEmpty(edittextSaqueValor.getText().toString())){
+            edittextSaqueValor.setError(getString(R.string.campo_obrigatorio));
+            root = edittextSaqueValor;
+            root.requestFocus();
+        } else {
+            boolean response;
+            Double valorSaque = Double.parseDouble(edittextSaqueValor.getText().toString());
+            String tipoTransacao = "saque";
+            Date dataTransacao = Calendar.getInstance().getTime();
+            Double valorAtualizado = cliente.getSaldo() + valorSaque;
 
-        response = Cliente.debitaContaCliente(cliente, valorSaque);
+            response = Cliente.debitaContaCliente(cliente, valorSaque);
 
-        if (response){
-            //cria objeto transacao origem
-            Realm realm = Realm.getDefaultInstance();
-            realm.beginTransaction();
-            Transacao transacaoOrigem = new Transacao(
-                    tipoTransacao,
-                    valorSaque,
-                    valorAtualizado,
-                    cliente.getSaldo(),
-                    dataTransacao,
-                    cliente.getNumeroConta(),
-                    null);
-            realm.commitTransaction();
-            realm.close();
+            if (response){
+                //cria objeto transacao origem
+                Realm realm = Realm.getDefaultInstance();
+                realm.beginTransaction();
+                Transacao transacaoOrigem = new Transacao(
+                        tipoTransacao,
+                        valorSaque,
+                        valorAtualizado,
+                        cliente.getSaldo(),
+                        dataTransacao,
+                        cliente.getNumeroConta(),
+                        null);
+                realm.commitTransaction();
+                realm.close();
 
-            Transacao.adicionaTransacaoBD(cliente, transacaoOrigem);
+                Transacao.adicionaTransacaoBD(cliente, transacaoOrigem);
 
-            String titulo =(String) activity.getResources().getText(R.string.mensagem_titulo);
-            String mensagem =(String) activity.getResources().getText(R.string.saque_efetuado_com_sucesso);
+                String titulo =(String) activity.getResources().getText(R.string.mensagem_titulo);
+                String mensagem =(String) activity.getResources().getText(R.string.saque_efetuado_com_sucesso);
 
-            TheBankUtil.alertBuilderTransacoes(activity, titulo, mensagem);
-        } else
-        {
-            String mensagemTitulo = (String) activity.getResources().getText(R.string.mensagem_titulo);
-            String corpoMensagem = (String) activity.getResources().getText(R.string.saldo_insuficiente);
-            TheBankUtil.alertBuilderTransacoes(activity,mensagemTitulo, corpoMensagem);
+                TheBankUtil.alertBuilderTransacoes(activity, titulo, mensagem);
+            } else
+            {
+                String mensagemTitulo = (String) activity.getResources().getText(R.string.mensagem_titulo);
+                String corpoMensagem = (String) activity.getResources().getText(R.string.saldo_insuficiente);
+                TheBankUtil.alertBuilderTransacoes(activity,mensagemTitulo, corpoMensagem);
+            }
+
+            contentFragment = new FragmentSaldo();
+            contentFragment.setArguments(contentFragmentArgs);
+            TheBankUtil.switchContent(activity, contentFragment, FragmentTransacaoSaque.FRAG_ID);
         }
-
-        contentFragment = new FragmentSaldo();
-        contentFragment.setArguments(contentFragmentArgs);
-        TheBankUtil.switchContent(activity, contentFragment, FragmentTransacaoSaque.FRAG_ID);
     }
-
 }

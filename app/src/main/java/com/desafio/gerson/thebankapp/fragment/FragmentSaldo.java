@@ -11,6 +11,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +20,7 @@ import android.widget.TextView;
 import com.desafio.gerson.thebankapp.R;
 import com.desafio.gerson.thebankapp.activity.MainActivity;
 import com.desafio.gerson.thebankapp.model.Cliente;
+import com.desafio.gerson.thebankapp.model.Transacao;
 import com.desafio.gerson.thebankapp.util.TheBankUtil;
 
 import java.text.NumberFormat;
@@ -93,22 +95,46 @@ public class FragmentSaldo extends Fragment {
 
         String saldoAtual = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("pt-BR")).format(cliente.getSaldo());
 
-        saldoNome.setText(cliente.getNome());
-        valorSaldo.setText(saldoAtual);
+        if(cliente.getPerfil().equals("normal")){
+            saldoNome.setText(cliente.getNome());
+            valorSaldo.setText(saldoAtual);
 
-        if (cliente.getSaldo() < 0){
-            valorSaldo.setTextColor(ContextCompat.getColor(activity, R.color.red));
-        } else {
-            valorSaldo.setTextColor(ContextCompat.getColor(activity, R.color.colorAccent));
+
+        } else{
+
+            Realm realm = Realm.getDefaultInstance();
+            RealmList<Transacao> transacoes = cliente.getTransacoes();
+            realm.close();
+
+            Transacao transacao = transacoes.last();
+
+            Log.i("transacoes=========>", transacao.toString());
+
+            if (cliente.getSaldo() < 0){
+                valorSaldo.setTextColor(ContextCompat.getColor(activity, R.color.red));
+            } else {
+                valorSaldo.setTextColor(ContextCompat.getColor(activity, R.color.colorAccent));
+            }
+
+
+
         }
-
-
-        Realm realm = Realm.getDefaultInstance();
-
-        //RealmList<Cliente> transacoes = cliente.getTransacoes();
-
-        realm.close();
         return view;
+
+
+
+
+
+
+
+
+
+
+
+
+
     }
+
+
 
 }

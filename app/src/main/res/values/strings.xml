@@ -14,7 +14,7 @@
     <string name="ok">OK</string>
     <string name="permissao_concedida">Permissão concedida</string>
     <string name="permissao_negada">Permissão negada</string>
-    <string name="usuario_nao_encontrado">Usuário não encontrado</string>
+    <string name="usuario_nao_encontrado">Cliente não encontrado</string>
     <string name="login_sucesso">Login efetuado com sucesso</string>
     <string name="title_activity_main">MainActivity</string>
     <string name="action_settings">Settings</string>
