@@ -116,7 +116,7 @@ public class FragmentTransacaoTransferencia extends Fragment implements View.OnC
                 }
 
                 Double saldoAtualOrigem = cliente.getSaldo();
-                Double saltoAtualizadoOrigem = saldoAtualOrigem + valorTransferencia;
+                Double saltoAtualizadoOrigem = saldoAtualOrigem - valorTransferencia;
                 Date dataTransacao = Calendar.getInstance().getTime();
                 String tipoTransacaoOrigem = "transferencia p/ CC " + contaDestino;
                 String tipoTransacaoDestino = "transferencia da CC " + cliente.getNumeroConta();
@@ -155,12 +155,12 @@ public class FragmentTransacaoTransferencia extends Fragment implements View.OnC
                         saldoAtualDestino,
                         saldoAtualizadoDestino,
                         dataTransacao,
-                        contaDestino,
-                        null);
+                        cliente.getNumeroConta(),
+                        contaDestino);
                 realm.commitTransaction();
                 realm.close();
 
-                Transacao.adicionaTransacaoBD(cliente, transacaoDestino);
+                Transacao.adicionaTransacaoBD(clienteDestino  , transacaoDestino);
 
 
                 String titulo = (String) activity.getResources().getText(R.string.mensagem_titulo);

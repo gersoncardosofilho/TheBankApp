@@ -65,11 +65,15 @@ public class RestClient {
         this.apiService = retrofit.create(MyApiInterface.class);
     }
 
-    public void getUserLogin(Map<String,String> data, Callback<Cliente> callback)
-    {
+    public void getUserLogin(Map<String,String> data, Callback<Cliente> callback){
         Call<Cliente> call = apiService.getUserLogin(data);
         call.enqueue(callback);
 
+    }
+
+    public void getUserByContaCorrente(String data, Callback<Cliente> callback){
+        Call<Cliente> call = apiService.getUserByContaCorrente(data);
+        call.enqueue(callback);
     }
 
     public void registraTransacao(Transacao transacao, Callback<Transacao> callback)

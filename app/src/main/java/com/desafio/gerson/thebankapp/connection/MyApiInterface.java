@@ -10,6 +10,8 @@ import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
+import retrofit2.http.Path;
+import retrofit2.http.Query;
 import retrofit2.http.QueryMap;
 
 /**
@@ -26,6 +28,9 @@ public interface MyApiInterface {
     //login
     @GET("api/cliente/login/")
     Call<Cliente> getUserLogin(@QueryMap Map<String,String> data);
+
+    @GET("api/cliente/{contaCorrente}")
+    Call<Cliente> getUserByContaCorrente(@Path("contaCorrente") String contaCorrente);
 
     //logout
     @GET("api/users/logout")
