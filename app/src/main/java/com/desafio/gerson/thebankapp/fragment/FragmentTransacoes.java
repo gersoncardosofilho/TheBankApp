@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.desafio.gerson.thebankapp.R;
@@ -30,14 +31,17 @@ public class FragmentTransacoes extends Fragment {
     private Bundle args;
     private String mContaCorrente;
 
-    @BindView(R.id.btnSaque)
-    Button buttonSaque;
+//    @BindView(R.id.btnSaque)
+//    Button buttonSaque;
+//
+    @BindView(R.id.framelayout_saque)
+    FrameLayout frameLayoutSaque;
 
-    @BindView(R.id.btnDeposito)
-    Button buttonDeposito;
+    @BindView(R.id.framelayout_deposito)
+    FrameLayout frameLayoutDeposito;
 
-    @BindView(R.id.btnTransferencia)
-    Button buttonTransferencia;
+    @BindView(R.id.framelayout_transferencia)
+    FrameLayout frameLayoutTransferencia;
 
     private Fragment contentFragment;
 
@@ -75,7 +79,7 @@ public class FragmentTransacoes extends Fragment {
 
         ButterKnife.bind(this, view);
 
-        buttonSaque.setOnClickListener(new View.OnClickListener() {
+        frameLayoutSaque.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
@@ -85,7 +89,7 @@ public class FragmentTransacoes extends Fragment {
             }
         });
 
-        buttonDeposito.setOnClickListener(new View.OnClickListener() {
+        frameLayoutDeposito.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 contentFragment = new FragmentTransacaoDeposito();
@@ -94,7 +98,7 @@ public class FragmentTransacoes extends Fragment {
             }
         });
 
-        buttonTransferencia.setOnClickListener(new View.OnClickListener() {
+        frameLayoutTransferencia.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 contentFragment = new FragmentTransacaoTransferencia();

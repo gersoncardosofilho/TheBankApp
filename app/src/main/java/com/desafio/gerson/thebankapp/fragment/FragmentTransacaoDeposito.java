@@ -33,7 +33,7 @@ public class FragmentTransacaoDeposito extends Fragment implements View.OnClickL
 
     Cliente cliente;
 
-    TextView textviewDepositoNome, textviewDepositoSaldo;
+    TextView textviewDepositoSaldo;
     EditText  edittextDepositoValor;
     Button buttonConfirmaDeposito;
     View root;
@@ -61,13 +61,11 @@ public class FragmentTransacaoDeposito extends Fragment implements View.OnClickL
 
         root = view;
 
-        textviewDepositoNome =(TextView) view.findViewById(R.id.textview_deposito_nome);
         textviewDepositoSaldo = (TextView) view.findViewById(R.id.textview_deposito_saldo);
         edittextDepositoValor = (EditText) view.findViewById(R.id.editText_deposito_valor);
         buttonConfirmaDeposito = (Button) view.findViewById(R.id.btn_deposito_confirma);
 
         cliente = Cliente.getClienteByContaCorrente(mContaCorrente);
-        textviewDepositoNome.setText(cliente.getNome());
         textviewDepositoSaldo.setText(new Double(cliente.getSaldo()).toString());
 
         buttonConfirmaDeposito.setOnClickListener(this);

@@ -8,4 +8,5 @@
     <color name="loginBox">#D79460</color>
     <color name="user_list">#fff9bc</color>
     <color name="red">#ff0000</color>
+    <color name="colorPrimaryLight">#3bff7506</color>
 </resources>

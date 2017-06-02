@@ -33,9 +33,9 @@ public class FragmentTransacaoTransferencia extends Fragment implements View.OnC
 
     Cliente cliente;
 
-    TextView textviewDepositoNome, textviewDepositoSaldo;
+    TextView textviewDepositoSaldo;
     EditText edittextDepositoValor, editTextDepositoContaDestino;
-    Button buttonConfirmaDeposito;
+    Button buttonConfirmaTransferencia;
 
     View root;
 
@@ -60,20 +60,15 @@ public class FragmentTransacaoTransferencia extends Fragment implements View.OnC
         View view = inflater.inflate(R.layout.fragment_transacao_transferencia, container, false);
         root = view;
 
-        textviewDepositoNome =(TextView) view.findViewById(R.id.textview_transferencia_nome);
         textviewDepositoSaldo = (TextView) view.findViewById(R.id.textview_transferencia_saldo);
         edittextDepositoValor = (EditText) view.findViewById(R.id.editText_transferencia_valor);
         editTextDepositoContaDestino = (EditText) view.findViewById(R.id.editText_transferencia_conta_destino);
-        buttonConfirmaDeposito = (Button) view.findViewById(R.id.btn_deposito_confirma);
+        buttonConfirmaTransferencia = (Button) view.findViewById(R.id.button_transferencia_confirma);
 
         cliente = Cliente.getClienteByContaCorrente(mContaCorrente);
-        textviewDepositoNome.setText(cliente.getNome());
         textviewDepositoSaldo.setText(new Double(cliente.getSaldo()).toString());
 
-
-
-
-        buttonConfirmaDeposito.setOnClickListener(this);
+        buttonConfirmaTransferencia.setOnClickListener(this);
 
         return view;
     }

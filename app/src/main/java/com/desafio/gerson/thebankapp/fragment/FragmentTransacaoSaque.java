@@ -4,6 +4,7 @@ package com.desafio.gerson.thebankapp.fragment;
 import android.content.Context;
 import android.os.Bundle;
 
+import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -15,8 +16,12 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.desafio.gerson.thebankapp.R;
+import com.desafio.gerson.thebankapp.activity.MainActivity;
 import com.desafio.gerson.thebankapp.model.Cliente;
 import com.desafio.gerson.thebankapp.util.TheBankUtil;
+
+import java.text.NumberFormat;
+import java.util.Locale;
 
 import io.realm.Realm;
 
@@ -36,7 +41,7 @@ public class FragmentTransacaoSaque extends Fragment implements View.OnClickList
 
     private Fragment contentFragment;
 
-    TextView textviewSaqueNome, textviewSaqueSaldo;
+    TextView textviewSaqueSaldo;
     EditText  edittextSaqueValor;
     Button buttonConfirmaSaque;
     View root;
@@ -51,12 +56,18 @@ public class FragmentTransacaoSaque extends Fragment implements View.OnClickList
         super.onAttach(context);
         activity = getActivity();
 
-
-
-
         args = getArguments();
         mContaCorrente = args.getString("contacorrente");
         contentFragmentArgs = args;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        ((MainActivity) getActivity()).setActionBarTitle("Saque");
+
+
     }
 
     @Override
@@ -66,14 +77,13 @@ public class FragmentTransacaoSaque extends Fragment implements View.OnClickList
 
         root = view;
 
-        textviewSaqueNome =(TextView) view.findViewById(R.id.textview_saque_nome);
         textviewSaqueSaldo = (TextView) view.findViewById(R.id.textview_saque_saldo);
         edittextSaqueValor = (EditText) view.findViewById(R.id.editText_saque_valor);
         buttonConfirmaSaque = (Button) view.findViewById(R.id.btn_saque_confirma);
 
         cliente = Cliente.getClienteByContaCorrente(mContaCorrente);
-        textviewSaqueNome.setText(cliente.getNome());
-        textviewSaqueSaldo.setText(new Double(cliente.getSaldo()).toString());
+        String saldoAtual = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("pt-BR")).format(cliente.getSaldo());
+        textviewSaqueSaldo.setText(saldoAtual);
 
         buttonConfirmaSaque.setOnClickListener(this);
         return view;
