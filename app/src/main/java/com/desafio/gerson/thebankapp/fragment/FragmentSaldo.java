@@ -24,6 +24,8 @@ import com.desafio.gerson.thebankapp.model.Transacao;
 import com.desafio.gerson.thebankapp.util.TheBankUtil;
 
 import java.text.NumberFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 
 import butterknife.BindView;
@@ -52,11 +54,17 @@ public class FragmentSaldo extends Fragment {
 
     FragmentManager fragmentManager;
 
+    String saldoVipAtualFormatado;
+
+    Transacao ultimaTransacao;
+
     @BindView(R.id.textview_saldo_nome)
     TextView saldoNome;
 
     @BindView(R.id.textview_saldo_valor_saldo)
     TextView valorSaldo;
+
+    View view = null;
 
 
     public FragmentSaldo() {
@@ -80,9 +88,7 @@ public class FragmentSaldo extends Fragment {
         activity = getActivity();
 
 
-
     }
-
 
 
     @Override
@@ -93,48 +99,108 @@ public class FragmentSaldo extends Fragment {
         cliente = Cliente.getClienteByContaCorrente(mContaCorrente);
         ButterKnife.bind(this, view);
 
-        String saldoAtual = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("pt-BR")).format(cliente.getSaldo());
+        if (cliente.getPerfil().equals("normal")) {
 
-        if(cliente.getPerfil().equals("normal")){
             saldoNome.setText(cliente.getNome());
-            valorSaldo.setText(saldoAtual);
+            valorSaldo.setText(NumberFormat.getCurrencyInstance(Locale.forLanguageTag("pt-BR")).format(cliente.getSaldo()));
+        } else {
+
+            RealmList<Transacao> transacoes = cliente.getTransacoes();
+
+            if (transacoes.isEmpty()) {
+
+                saldoNome.setText(cliente.getNome());
+                valorSaldo.setText(NumberFormat.getCurrencyInstance(Locale.forLanguageTag("pt-BR")).format(cliente.getSaldo()));
+
+            } else {
+
+                ultimaTransacao = cliente.getTransacoes().last();
+                Log.i("Ultima transacao", ultimaTransacao.toString());
+
+                if (ultimaTransacao.getSaldoAtual() > 0) {
+                    saldoNome.setText(cliente.getNome());
+                    valorSaldo.setText(NumberFormat.getCurrencyInstance(Locale.forLanguageTag("pt-BR")).format(cliente.getSaldo()));
+                } else {
+
+                    calculaSaldo();
+                }
+            }
+        }
+
+        return view;
+    }
 
 
-        } else{
-
+    public void calculaSaldo() {
+        if(cliente.getSaldo() < 0 )
+        {
+            saldoNome.setText(cliente.getNome());
+            valorSaldo.setText(NumberFormat.getCurrencyInstance(Locale.forLanguageTag("pt-BR")).format(cliente.getSaldo()));
+        } else {
             Realm realm = Realm.getDefaultInstance();
             RealmList<Transacao> transacoes = cliente.getTransacoes();
             realm.close();
 
             Transacao transacao = transacoes.last();
 
-            Log.i("transacoes=========>", transacao.toString());
+            if (transacao == null) {
+                String titulo = (String) activity.getResources().getText(R.string.mensagem_titulo);
+                String mensagem = (String) activity.getResources().getText(R.string.usuario_nao_encontrado);
 
-            if (cliente.getSaldo() < 0){
-                valorSaldo.setTextColor(ContextCompat.getColor(activity, R.color.red));
+                TheBankUtil.alertBuilderTransacoes(activity, titulo, "Voce ainda nao tem movimentacoes");
+
+
             } else {
-                valorSaldo.setTextColor(ContextCompat.getColor(activity, R.color.colorAccent));
+
+                Double saldoVipAtual = transacao.getSaldoAtualizado();
+                Double saldoVipAnterior = transacao.getSaldoAtual();
+                String tipoTransacao = "tarifa a descoberto";
+                Date dataTransacao = Calendar.getInstance().getTime();
+
+                //Transacao ultimaTransacaoSaldoNegativo = transacoes.where().equalTo("SaldoAtualizado", saldoVipAnterior).findFirst();
+
+                RealmResults<Transacao> results = realm.where(Transacao.class).equalTo("SaldoAtualizado",saldoVipAnterior).findAll();
+
+                Transacao ultimaTransacaoSaldoNegativo = results.first();
+
+                Date dataUltimoSaldoNegativo = ultimaTransacaoSaldoNegativo.getDataTransacao();
+
+                Date dataAtual = transacao.getDataTransacao();
+
+                long baseCalculo = (dataAtual.getTime() / 60000) - (dataUltimoSaldoNegativo.getTime() / 60000);
+
+                Double valorADebitar = baseCalculo * 0.1;
+
+                Double valorDebitado = cliente.getSaldo() - valorADebitar;
+
+                Log.i("Saldo novo ===>", valorADebitar.toString());
+
+                Cliente.debitaContaCliente(cliente, valorADebitar);
+
+                //cria objeto transacao debito
+                realm.beginTransaction();
+                Transacao transacaoOrigem = new Transacao(
+                        tipoTransacao,
+                        valorADebitar,
+                        valorDebitado,
+                        cliente.getSaldo(),
+                        dataTransacao,
+                        cliente.getNumeroConta(),
+                        null);
+                realm.commitTransaction();
+                realm.close();
+
+                Transacao.adicionaTransacaoBD(cliente, transacaoOrigem);
+
+                saldoNome.setText(cliente.getNome());
+                valorSaldo.setText(NumberFormat.getCurrencyInstance(Locale.forLanguageTag("pt-BR")).format(valorDebitado));
+
             }
-
-
-
         }
-        return view;
-
-
-
-
-
-
-
-
-
-
-
-
-
     }
-
-
-
 }
+
+
+
+
+
