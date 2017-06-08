@@ -69,14 +69,6 @@ public class Transacao extends RealmObject {
         return Id;
     }
 
-//    public double getSaldoAnterior() {
-//        return SaldoAnterior;
-//    }
-//
-//    public void setSaldoAnterior(double saldoAnterior) {
-//        SaldoAnterior = saldoAnterior;
-//    }
-
     public double getSaldoAtual() {
         return SaldoAtual;
     }

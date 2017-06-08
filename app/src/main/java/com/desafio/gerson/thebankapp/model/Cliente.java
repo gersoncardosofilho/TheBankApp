@@ -37,6 +37,7 @@ public class Cliente extends RealmObject {
     private String NumeroAgencia;
     public RealmList<Transacao> transacoes;
 
+
     //constructor
     public Cliente(){}
 
@@ -78,6 +79,7 @@ public class Cliente extends RealmObject {
         Cliente c = realm.copyToRealmOrUpdate(cliente);
         realm.commitTransaction();
     }
+
 
     public static boolean executaDepositoCliente(Double valorDeposito, Cliente cliente){
 
@@ -143,52 +145,6 @@ public class Cliente extends RealmObject {
             return false;
         }
     }
-
-//    public static void executaTransferenciaEntreContas(Double valorASerTransferido, String contaDestino, Cliente cliente){
-//
-//        Realm realm = Realm.getDefaultInstance();
-//
-//
-//        Calendar calendar = Calendar.getInstance();
-//        Date dataTransacao = calendar.getTime();
-//        double saldoOrigemAtual = cliente.getSaldo() - valorASerTransferido;
-//
-//        Cliente clienteDestino = getClienteByContaCorrente(contaDestino);
-//        double saldoDestinoAtual = clienteDestino.getSaldo() + valorASerTransferido;
-//        executaDepositoCliente(valorASerTransferido, clienteDestino);
-//        debitaContaCliente(cliente, valorASerTransferido);
-//
-//        //cria objeto transacao cliente origem
-//        realm.beginTransaction();
-//        Transacao transacaoOrigem = new Transacao(
-//                tipoTransacaoOrigem,
-//                cliente.getSaldo(),
-//                valorASerTransferido,
-//                saldoOrigemAtual,
-//                dataTransacao,
-//                cliente.getNumeroConta(),
-//                contaDestino);
-//        realm.commitTransaction();
-//        realm.close();
-//
-//
-//        //cria objeto transacao cliente destino
-//        realm.beginTransaction();
-//        Transacao transacaoDestino = new Transacao(
-//                tipoTransacaoDestino,
-//                clienteDestino.getSaldo(),
-//                valorASerTransferido,
-//                saldoDestinoAtual,
-//                dataTransacao,
-//                cliente.getNumeroConta(),
-//                clienteDestino.getNumeroConta());
-//        realm.commitTransaction();
-//        realm.close();
-//
-//
-//        Transacao.adicionaTransacaoBD(cliente, transacaoOrigem);
-//        Transacao.adicionaTransacaoBD(clienteDestino, transacaoDestino);
-//    }
 
     public static List<Transacao> listaExtratoCliente(final Cliente cliente){
 

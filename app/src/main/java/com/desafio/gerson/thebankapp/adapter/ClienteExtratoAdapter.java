@@ -68,7 +68,7 @@ public class ClienteExtratoAdapter extends RealmBaseAdapter<Transacao> implement
 
 
 
-            if (descricao.equals("saque") || descricao.contains("ncia p/") || descricao.contains("taxa")){
+            if (descricao.equals("saque") || descricao.contains("ncia p/") || descricao.contains("taxa") || descricao.contains("taxa a descoberto")){
                 viewHolder.valorTransacao.setTextColor(ContextCompat.getColor(context, R.color.red));
 
             } else {

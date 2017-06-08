@@ -93,7 +93,6 @@ public class FragmentTransacaoTransferencia extends Fragment implements View.OnC
     @Override
     public void onClick(View v) {
 
-
         boolean cancel = false;
 
         if (TextUtils.isEmpty(edittextDepositoValor.getText().toString())){
@@ -138,9 +137,12 @@ public class FragmentTransacaoTransferencia extends Fragment implements View.OnC
                     Date dataTransacao = Calendar.getInstance().getTime();
                     String tipoTransacaoOrigem = "transferencia p/ CC " + contaDestino;
                     String tipoTransacaoDestino = "transferencia da CC " + cliente.getNumeroConta();
+                    String taxa = "taxa transferência";
+                    Double valorTaxa = 0.80;
                     Realm realm = Realm.getDefaultInstance();
 
                     Cliente.debitaContaCliente(cliente, valorTransferencia);
+
 
                     //cria objeto transacao origem
                     realm.beginTransaction();

@@ -2,6 +2,7 @@ package com.desafio.gerson.thebankapp;
 
 import com.desafio.gerson.thebankapp.model.Cliente;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import io.realm.Realm;
@@ -22,27 +23,6 @@ public class TheBankUnitTest {
         assertEquals(4, 2 + 2);
     }
 
-    @Test
-    public void TestaSaqueClienteNormal(){
 
-        boolean success;
 
-        Cliente cliente = new Cliente();
-        cliente.setNome("Nome Cliente");
-        cliente.setPerfil("normal");
-        cliente.setSaldo(1000.00);
-        cliente.setCpf("888888888-88");
-        cliente.setNumeroAgencia("0001");
-        cliente.setNumeroConta("12345");
-        cliente.setSenha("Cliente senha");
-
-        //success = Cliente.executaSaqueCliente(null, cliente, 2000.00);
-
-        assertTrue("saldo insuficiente", false);
-    }
-
-    @Test
-    public void TestaSaqueClienteVip(){
-
-    }
 }

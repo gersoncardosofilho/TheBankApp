@@ -64,6 +64,9 @@ public class LoginActivity extends AppCompatActivity {
 
     }
 
+
+
+
     @OnClick(R.id.btnLogar)
     public void login(){
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
